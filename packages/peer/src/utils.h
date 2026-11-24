@@ -20,11 +20,14 @@
 #define LOG_LEVEL LEVEL_INFO
 #endif
 
+/* The LOGx macros and the redirected LOG_PRINT use only C99 variadic macros.
+ * Some compilers (Renesas CC-RX) drop the comma of `, ##__VA_ARGS__` even
+ * when arguments are present. */
 #if LOG_REDIRECT
 void peer_log(char *level_tag, const char *file_name, int line_number,
               const char *fmt, ...);
-#define LOG_PRINT(level_tag, fmt, ...)                                         \
-  peer_log(level_tag, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
+#define LOG_PRINT(level_tag, ...)                                              \
+  peer_log(level_tag, __FILE__, __LINE__, __VA_ARGS__)
 #else
 #define LOG_PRINT(level_tag, fmt, ...)                                         \
   fprintf(stderr, "%s\t%s\t%d\t" fmt "\n", level_tag, __FILE__,                \
@@ -32,27 +35,27 @@ void peer_log(char *level_tag, const char *file_name, int line_number,
 #endif
 
 #if LOG_LEVEL >= LEVEL_DEBUG
-#define LOGD(fmt, ...) LOG_PRINT(DEBUG_TAG, fmt, ##__VA_ARGS__)
+#define LOGD(...) LOG_PRINT(DEBUG_TAG, __VA_ARGS__)
 #else
-#define LOGD(fmt, ...)
+#define LOGD(...)
 #endif
 
 #if LOG_LEVEL >= LEVEL_INFO
-#define LOGI(fmt, ...) LOG_PRINT(INFO_TAG, fmt, ##__VA_ARGS__)
+#define LOGI(...) LOG_PRINT(INFO_TAG, __VA_ARGS__)
 #else
-#define LOGI(fmt, ...)
+#define LOGI(...)
 #endif
 
 #if LOG_LEVEL >= LEVEL_WARN
-#define LOGW(fmt, ...) LOG_PRINT(WARN_TAG, fmt, ##__VA_ARGS__)
+#define LOGW(...) LOG_PRINT(WARN_TAG, __VA_ARGS__)
 #else
-#define LOGW(fmt, ...)
+#define LOGW(...)
 #endif
 
 #if LOG_LEVEL >= LEVEL_ERROR
-#define LOGE(fmt, ...) LOG_PRINT(ERROR_TAG, fmt, ##__VA_ARGS__)
+#define LOGE(...) LOG_PRINT(ERROR_TAG, __VA_ARGS__)
 #else
-#define LOGE(fmt, ...)
+#define LOGE(...)
 #endif
 
 #define ALIGN32(num) ((num + 3) & ~3)
